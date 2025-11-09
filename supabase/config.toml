@@ -1,0 +1,10 @@
+project_id = "dcmwxdzbsnlvhrojbxjf"
+
+[functions.crop-diagnostic]
+verify_jwt = false
+
+[functions.farm-advisory]
+verify_jwt = false
+
+[functions.weather-info]
+verify_jwt = false

@@ -1,0 +1,104 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 
+  Krishi Mitra Pro - Dual Theme Color System
+  This palette is designed for a clean, professional, and readable agricultural tech vibe.
+*/
+
+@layer base {
+  :root {
+    /* Light Mode Palette */
+    --background: 0 0% 98%; /* #FAFAFA */
+    --foreground: 215 30% 18%; /* #1E293B */
+
+    --card: 0 0% 100%; /* #FFFFFF */
+    --card-foreground: 215 30% 18%; /* #1E293B */
+
+    --popover: 0 0% 100%; /* #FFFFFF */
+    --popover-foreground: 215 30% 18%; /* #1E293B */
+
+    /* Brand Identity */
+    --primary: 122 48% 33%; /* #2E7D32 */
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 122 39% 49%; /* #4CAF50 - Success Green */
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 215 16% 90%; /* Lighter shade for muted bg */
+    --muted-foreground: 215 16% 47%; /* #64748B */
+
+    --accent: 39 95% 56%; /* #F9A825 - Amber */
+    --accent-foreground: 215 30% 18%; /* #1E293B */
+
+    --destructive: 1 79% 55%; /* #E53935 */
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 0 0% 88%; /* #E0E0E0 */
+    --input: 0 0% 88%; /* #E0E0E0 */
+    --ring: 122 48% 33%; /* #2E7D32 */
+
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    /* Dark Mode Palette */
+    --background: 222 47% 11%; /* #0F172A */
+    --foreground: 210 40% 96%; /* #F1F5F9 */
+
+    --card: 215 30% 18%; /* #1E293B */
+    --card-foreground: 210 40% 96%; /* #F1F5F9 */
+
+    --popover: 215 30% 18%; /* #1E293B */
+    --popover-foreground: 210 40% 96%; /* #F1F5F9 */
+
+    /* Brand Identity (Dark) */
+    --primary: 123 44% 64%; /* #81C784 - Softer Green */
+    --primary-foreground: 222 47% 11%; /* #0F172A */
+
+    --secondary: 122 39% 49%; /* #4CAF50 - Success Green */
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 215 28% 20%; /* Darker muted bg */
+    --muted-foreground: 215 25% 65%; /* #94A3B8 */
+
+    --accent: 39 95% 56%; /* #F9A825 - Amber */
+    --accent-foreground: 222 47% 11%; /* #0F172A */
+    
+    --destructive: 1 79% 55%; /* #E53935 */
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 215 28% 27%; /* #334155 */
+    --input: 215 28% 27%; /* #334155 */
+    --ring: 123 44% 64%; /* #81C784 */
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border transition-colors duration-200;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Inter', sans-serif;
+  }
+}
+
+@layer utilities {
+  .fade-in-up {
+    animation: fadeInUp 0.6s ease-in-out;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
