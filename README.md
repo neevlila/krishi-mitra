@@ -98,6 +98,7 @@ Add them to a `.env` file before running the project locally.
 Clone the repository:
 
 git clone https://github.com/neevlila/krishi-miitra.git
+
 cd krishi-miitra
 
 Install dependencies:
