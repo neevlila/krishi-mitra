@@ -137,7 +137,7 @@ const Landing = () => {
               </a>
             </div>
             <p className="text-center text-muted-foreground text-sm">
-              © 2025 {t('appName')} by Purva Patel, Janvi Makwana, Shruti Panchal, Suhani Malaviya, Krisha Raja - {t('tagline')}
+              © 2025 {t('appName')} by Neev Lila - {t('tagline')}
             </p>
           </div>
         </div>
