@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTheme } from "@/contexts/ThemeContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -36,6 +37,7 @@ const WeatherDetail = ({ icon, label, value }: { icon: React.ReactNode, label: s
 const WeatherWidget = () => {
   const { t } = useLanguage();
   const { toast } = useToast();
+  const { theme } = useTheme();
   const [weather, setWeather] = useState<WeatherData | null>(null);
   const [loading, setLoading] = useState(false);
   const [city, setCity] = useState("");
@@ -83,10 +85,9 @@ const WeatherWidget = () => {
     return Math.round(temp);
   };
 
-  const isDay = new Date().getHours() >= 6 && new Date().getHours() < 18;
-  const cardBackground = isDay 
-    ? "bg-gradient-to-br from-primary/5 to-background dark:from-primary/10 dark:to-background"
-    : "bg-gradient-to-br from-slate-800 to-indigo-950 dark:from-slate-900/50 dark:to-indigo-950/50";
+  const cardBackground = theme === 'dark'
+    ? "bg-gradient-to-br from-slate-800 to-indigo-950"
+    : "bg-gradient-to-br from-primary/5 to-background";
 
   const getWeatherDescription = (weatherData: WeatherData) => {
     const mainWeather = weatherData.weather[0].main.toLowerCase();
@@ -144,7 +145,7 @@ const WeatherWidget = () => {
         )}
 
         {weather && !loading && (
-          <div className="space-y-4 fade-in-up pt-4 text-primary">
+          <div className="space-y-4 fade-in-up pt-4 text-foreground">
             <div className="flex flex-col sm:flex-row items-center justify-center sm:justify-start gap-x-4 gap-y-2 text-center sm:text-left">
               {weather.weather[0].icon && (
                 <WeatherIcon 
