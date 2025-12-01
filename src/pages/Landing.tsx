@@ -28,7 +28,7 @@ const Landing = () => {
       </div>
       
       {/* Hero Section */}
-      <div className="container mx-auto px-4 py-16 pb-8 fade-in-up">
+      <div className="container mx-auto px-4 py-24 pb-8 fade-in-up">
         <div className="text-center mb-12">
           <div className="flex items-center justify-center mb-6">
             <div className="w-20 h-20 bg-primary rounded-full flex items-center justify-center shadow-lg shadow-primary/30">
@@ -65,7 +65,7 @@ const Landing = () => {
           </div>
         </div>
 
-        <div id="features" className="mt-32 pt-16">
+        <div id="features" className="mt-40 pt-4">
           <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-12">
             {t('features')}
           </h2>
