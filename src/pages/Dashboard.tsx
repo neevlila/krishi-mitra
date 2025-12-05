@@ -112,7 +112,7 @@ const Dashboard = () => {
               </a>
             </div>
             <p className="text-center text-muted-foreground text-sm">
-              © 2025 {t('appName')} by Janvi Makwana, Shruti Panchal, Purva Patel, Tanusha Mali, Suhani Malaviya, Kandhal Patel, Krisha Raja, Hetvi Patel - {t('tagline')}
+              © 2025 {t('appName')} by Neev Lila & Harsh Parekh- {t('tagline')}
             </p>
           </div>
         </div>
