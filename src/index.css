@@ -1,0 +1,286 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 
+  Krishi Mitra Pro - Dual Theme Color System
+  This palette is designed for a clean, professional, and readable agricultural tech vibe.
+*/
+
+@layer base {
+  :root {
+    /* Light Mode Palette */
+    --background: 0 0% 98%; /* #FAFAFA */
+    --foreground: 215 30% 18%; /* #1E293B */
+
+    --card: 0 0% 100%; /* #FFFFFF */
+    --card-foreground: 215 30% 18%; /* #1E293B */
+
+    --popover: 0 0% 100%; /* #FFFFFF */
+    --popover-foreground: 215 30% 18%; /* #1E293B */
+
+    /* Brand Identity */
+    --primary: 122 48% 33%; /* #2E7D32 */
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 122 39% 49%; /* #4CAF50 - Success Green */
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 215 16% 90%; /* Lighter shade for muted bg */
+    --muted-foreground: 215 16% 47%; /* #64748B */
+
+    --accent: 39 95% 56%; /* #F9A825 - Amber */
+    --accent-foreground: 215 30% 18%; /* #1E293B */
+
+    --destructive: 1 79% 55%; /* #E53935 */
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 0 0% 88%; /* #E0E0E0 */
+    --input: 0 0% 88%; /* #E0E0E0 */
+    --ring: 122 48% 33%; /* #2E7D32 */
+
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    /* Dark Mode Palette */
+    --background: 222 47% 11%; /* #0F172A */
+    --foreground: 210 40% 96%; /* #F1F5F9 */
+
+    --card: 215 30% 18%; /* #1E293B */
+    --card-foreground: 210 40% 96%; /* #F1F5F9 */
+
+    --popover: 215 30% 18%; /* #1E293B */
+    --popover-foreground: 210 40% 96%; /* #F1F5F9 */
+
+    /* Brand Identity (Dark) */
+    --primary: 123 44% 64%; /* #81C784 - Softer Green */
+    --primary-foreground: 222 47% 11%; /* #0F172A */
+
+    --secondary: 122 39% 49%; /* #4CAF50 - Success Green */
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 215 28% 20%; /* Darker muted bg */
+    --muted-foreground: 215 25% 65%; /* #94A3B8 */
+
+    --accent: 39 95% 56%; /* #F9A825 - Amber */
+    --accent-foreground: 222 47% 11%; /* #0F172A */
+    
+    --destructive: 1 79% 55%; /* #E53935 */
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 215 28% 27%; /* #334155 */
+    --input: 215 28% 27%; /* #334155 */
+    --ring: 123 44% 64%; /* #81C784 */
+  }
+}
+
+@layer base {
+  html {
+    font-size: 17.38px; /* Natively scales all layout metrics to 95% zoom */
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Inter', sans-serif;
+  }
+}
+
+@layer utilities {
+  .fade-in-up {
+    animation: fadeInUp 0.6s ease-in-out;
+  }
+
+  .fade-in-up-3d {
+    animation: fadeInUp3d 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .float-slow {
+    animation: floatSlow 6s ease-in-out infinite;
+  }
+
+  .animate-bounce-slow {
+    animation: bounceSlow 3s ease-in-out infinite;
+  }
+
+  .pulse-glow-primary {
+    animation: pulseGlowPrimary 3s ease-in-out infinite;
+  }
+
+  .pulse-glow-emerald {
+    animation: pulseGlowEmerald 3s ease-in-out infinite;
+  }
+
+  /* Glassmorphism Classes */
+  .glass-panel {
+    background: rgba(255, 255, 255, 0.45);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+  }
+
+  .dark .glass-panel {
+    background: rgba(30, 41, 59, 0.45);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .glass-panel-heavy {
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.35);
+  }
+
+  .dark .glass-panel-heavy {
+    background: rgba(15, 23, 42, 0.75);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  /* 3D Transform Utilities */
+  .card-3d-wrap {
+    perspective: 1000px;
+    transform-style: preserve-3d;
+  }
+
+  .card-3d {
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
+    transform: rotateX(0deg) rotateY(0deg) translateZ(0);
+  }
+
+  .card-3d:hover {
+    transform: translateZ(10px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  }
+
+  .dark .card-3d:hover {
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(16, 185, 129, 0.1);
+  }
+
+  /* Interactive Wave CSS Animation for dials */
+  .wave-fill {
+    animation: waveMove 12s linear infinite;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fadeInUp3d {
+    from {
+      opacity: 0;
+      transform: translateY(40px) rotateX(10deg);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) rotateX(0);
+    }
+  }
+
+  @keyframes floatSlow {
+    0%, 100% {
+      transform: translateY(0px) rotate(0deg);
+    }
+    50% {
+      transform: translateY(-15px) rotate(2deg);
+    }
+  }
+
+  @keyframes bounceSlow {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-8px);
+    }
+  }
+
+  @keyframes pulseGlowPrimary {
+    0%, 100% {
+      box-shadow: 0 0 15px rgba(46, 125, 50, 0.2);
+    }
+    50% {
+      box-shadow: 0 0 30px rgba(46, 125, 50, 0.5);
+    }
+  }
+
+  @keyframes pulseGlowEmerald {
+    0%, 100% {
+      box-shadow: 0 0 15px rgba(16, 185, 129, 0.2);
+    }
+    50% {
+      box-shadow: 0 0 30px rgba(16, 185, 129, 0.5), 0 0 10px rgba(16, 185, 129, 0.2);
+    }
+  }
+
+  @keyframes waveMove {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+
+  /* Scrollbar hiding utilities */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+
+  /* View Transition Circular Clip Reveal Override */
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+    mix-blend-mode: normal;
+  }
+  ::view-transition-old(root) {
+    z-index: 1;
+  }
+  ::view-transition-new(root) {
+    z-index: 9999;
+    animation: 500ms cubic-bezier(0.4, 0, 0.2, 1) both reveal-theme;
+  }
+
+  @keyframes reveal-theme {
+    from {
+      clip-path: circle(0px at var(--click-x, 50%) var(--click-y, 50%));
+    }
+    to {
+      clip-path: circle(135% at var(--click-x, 50%) var(--click-y, 50%));
+    }
+  }
+
+  /* WhatsApp Bouncing Dots Typing Animation */
+  @keyframes typingBounce {
+    0%, 100% {
+      transform: translateY(0);
+      opacity: 0.4;
+    }
+    50% {
+      transform: translateY(-5px);
+      opacity: 1;
+    }
+  }
+
+  .dot-bounce {
+    animation: typingBounce 1s infinite ease-in-out;
+  }
+}
