@@ -73,7 +73,7 @@ const Header = ({ user }: HeaderProps) => {
               {/* Language Selector */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="icon" className="transition-all hover:ring-2 hover:ring-primary/50">
+                  <Button variant="outline" size="icon" className="transition-all hover:ring-2 hover:ring-primary/50" aria-label="Select language">
                     <Globe className="h-5 w-5" />
                   </Button>
                 </DropdownMenuTrigger>
@@ -89,16 +89,16 @@ const Header = ({ user }: HeaderProps) => {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-
+ 
               {/* Theme Toggle */}
-              <Button variant="outline" size="icon" onClick={toggleTheme} className="transition-all hover:ring-2 hover:ring-primary/50">
+              <Button variant="outline" size="icon" onClick={toggleTheme} className="transition-all hover:ring-2 hover:ring-primary/50" aria-label="Toggle dark mode">
                 {theme === 'light' ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
               </Button>
-
+ 
               {/* Combined Navigation and User Menu */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="icon" className="transition-all hover:ring-2 hover:ring-primary/50">
+                  <Button variant="outline" size="icon" className="transition-all hover:ring-2 hover:ring-primary/50" aria-label="Navigation Menu">
                     <Menu className="h-5 w-5" />
                   </Button>
                 </DropdownMenuTrigger>

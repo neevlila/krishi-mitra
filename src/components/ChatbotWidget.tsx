@@ -194,6 +194,7 @@ const ChatbotWidget = () => {
                   });
                 }}
                 title="Clear Chat"
+                aria-label="Clear chat history"
               >
                 <RefreshCw className="w-3.5 h-3.5" />
               </Button>
@@ -202,6 +203,7 @@ const ChatbotWidget = () => {
                 size="icon"
                 className="h-7 w-7 text-white hover:bg-white/10 rounded-full transition-colors"
                 onClick={() => setIsOpen(false)}
+                aria-label="Close chatbot panel"
               >
                 <X className="w-3.5 h-3.5" />
               </Button>
@@ -287,6 +289,7 @@ const ChatbotWidget = () => {
               onClick={() => handleSendMessage(input)}
               disabled={!input.trim() || loading}
               className="h-8 w-8 rounded-xl bg-gradient-to-tr from-primary to-emerald-600 hover:from-primary hover:to-emerald-500 text-white shadow-md transition-all duration-300"
+              aria-label="Send message"
             >
               <Send className="w-3.5 h-3.5" />
             </Button>
@@ -298,6 +301,7 @@ const ChatbotWidget = () => {
       <Button
         onClick={() => setIsOpen(!isOpen)}
         className="h-14 w-14 rounded-full shadow-2xl flex items-center justify-center p-0 bg-gradient-to-tr from-primary to-emerald-500 hover:from-primary/95 hover:to-emerald-400 text-white border-none transform transition-transform hover:scale-105 active:scale-95 animate-bounce-slow pulse-glow-emerald"
+        aria-label="Toggle chat assistant"
       >
         <MessageSquare className="w-6 h-6" />
       </Button>

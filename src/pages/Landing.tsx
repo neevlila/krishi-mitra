@@ -56,6 +56,7 @@ const Landing = () => {
               size="icon"
               onClick={toggleTheme}
               className="rounded-full h-9 w-9 bg-card border-border hover:bg-muted"
+              aria-label="Toggle dark mode"
             >
               {theme === 'dark' ? <Sun className="h-4.5 w-4.5" /> : <Moon className="h-4.5 w-4.5" />}
             </Button>
@@ -131,7 +132,7 @@ const Landing = () => {
                   <Leaf className="w-10 h-10 sm:w-12 sm:h-12 text-primary-foreground animate-bounce-slow" />
                   <div className="absolute inset-0 rounded-full border border-white/30 animate-ping opacity-20" />
                 </div>
-                <h4 className="font-extrabold text-base text-foreground tracking-tight">Crop Diagnostic Node</h4>
+                <div className="font-extrabold text-base text-foreground tracking-tight">Crop Diagnostic Node</div>
                 <p className="text-[10px] text-muted-foreground mt-1">Simulating Live Crop Analysis</p>
 
                 {/* Orbiting metric 1 */}
