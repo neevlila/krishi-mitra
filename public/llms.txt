@@ -1,0 +1,17 @@
+# Krishi-Mitra
+
+> Smart Digital Agriculture & Crop Telemetry Platform
+
+Krishi-Mitra is an advanced, mobile-responsive digital agriculture platform designed to empower modern farming with localized climate intelligence, computer-vision crop leaf pathology diagnostics, and interactive agronomic advisory.
+
+## Key Pages
+- [Dashboard](https://krishi-mitra-mu-five.vercel.app/dashboard): Main farm telemetry hub presenting localized weather alerts, soil metrics, and crop logs.
+- [Crop Diagnostics](https://krishi-mitra-mu-five.vercel.app/diagnosis): Computer-vision scanning tool to diagnose leaf pathology from images.
+- [Expert Advisory](https://krishi-mitra-mu-five.vercel.app/advisory): Natural language agronomic assistant for crop-care and treatment recommendations.
+- [Climate Insights](https://krishi-mitra-mu-five.vercel.app/climate): Deep localized weather forecasting and telemetry charts.
+- [Contact Hub](https://krishi-mitra-mu-five.vercel.app/contact): Contact form to submit agronomic inquiries.
+
+## Technical Details
+- Built using React 18, Vite, TypeScript, and TailwindCSS.
+- Secure Supabase database integration for telemetry logging.
+- Low-latency, load-balanced Deno Edge functions connecting to NVIDIA NIM API.
