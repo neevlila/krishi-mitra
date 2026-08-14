@@ -131,7 +131,7 @@ const Landing = () => {
                   <Leaf className="w-10 h-10 sm:w-12 sm:h-12 text-primary-foreground animate-bounce-slow" />
                   <div className="absolute inset-0 rounded-full border border-white/30 animate-ping opacity-20" />
                 </div>
-                <h4 className="font-extrabold text-base text-foreground tracking-tight">AI Diagnostic Node</h4>
+                <h4 className="font-extrabold text-base text-foreground tracking-tight">Crop Diagnostic Node</h4>
                 <p className="text-[10px] text-muted-foreground mt-1">Simulating Live Crop Analysis</p>
 
                 {/* Orbiting metric 1 */}
@@ -164,10 +164,10 @@ const Landing = () => {
             <h2 className="text-3xl md:text-4xl font-extrabold text-center text-foreground mb-16 tracking-tight">
               {t('features')}
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 card-3d-wrap">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               
               {/* Feature 1 */}
-              <div className="glass-panel p-6 rounded-2xl border hover:shadow-xl hover:shadow-primary/15 transition-all duration-300 card-3d">
+              <div className="glass-panel p-6 rounded-2xl border border-border/40 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 hover:-translate-y-1">
                 <div className="w-12 h-12 bg-primary/15 rounded-xl flex items-center justify-center mb-5 border border-primary/20">
                   <Leaf className="w-6 h-6 text-primary" />
                 </div>
@@ -180,7 +180,7 @@ const Landing = () => {
               </div>
 
               {/* Feature 2 */}
-              <div className="glass-panel p-6 rounded-2xl border hover:shadow-xl hover:shadow-emerald-500/15 transition-all duration-300 card-3d">
+              <div className="glass-panel p-6 rounded-2xl border border-border/40 hover:shadow-xl hover:shadow-emerald-500/5 transition-all duration-300 hover:-translate-y-1">
                 <div className="w-12 h-12 bg-emerald-500/15 rounded-xl flex items-center justify-center mb-5 border border-emerald-500/20">
                   <Gauge className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
                 </div>
@@ -193,7 +193,7 @@ const Landing = () => {
               </div>
 
               {/* Feature 3 */}
-              <div className="glass-panel p-6 rounded-2xl border hover:shadow-xl hover:shadow-accent/15 transition-all duration-300 card-3d">
+              <div className="glass-panel p-6 rounded-2xl border border-border/40 hover:shadow-xl hover:shadow-accent/5 transition-all duration-300 hover:-translate-y-1">
                 <div className="w-12 h-12 bg-accent/15 rounded-xl flex items-center justify-center mb-5 border border-accent/20">
                   <Camera className="w-6 h-6 text-accent" />
                 </div>
@@ -206,7 +206,7 @@ const Landing = () => {
               </div>
 
               {/* Feature 4 */}
-              <div className="glass-panel p-6 rounded-2xl border hover:shadow-xl hover:shadow-primary/15 transition-all duration-300 card-3d">
+              <div className="glass-panel p-6 rounded-2xl border border-border/40 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 hover:-translate-y-1">
                 <div className="w-12 h-12 bg-primary/15 rounded-xl flex items-center justify-center mb-5 border border-primary/20">
                   <CloudSun className="w-6 h-6 text-primary" />
                 </div>

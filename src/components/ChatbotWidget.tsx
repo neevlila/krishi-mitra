@@ -175,7 +175,7 @@ const ChatbotWidget = () => {
                 <span className="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-emerald-400 border border-primary animate-pulse" />
               </div>
               <div>
-                <h4 className="font-extrabold text-xs tracking-tight text-white leading-none">Krishi AI Mitra</h4>
+                <h4 className="font-extrabold text-xs tracking-tight text-white leading-none">Krishi-Mitra Assistant</h4>
                 <p className="text-[9px] text-emerald-100 flex items-center gap-1 mt-0.5">
                   <Sparkles className="w-2.5 h-2.5 text-accent" /> Active Advisor
                 </p>
