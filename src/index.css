@@ -117,11 +117,37 @@
   }
 
   .pulse-glow-primary {
-    animation: pulseGlowPrimary 3s ease-in-out infinite;
+    position: relative;
+    isolation: isolate;
+  }
+  .pulse-glow-primary::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: #2e7d32;
+    opacity: 0;
+    transform: scale(1);
+    animation: compositedPulsePrimary 3s ease-in-out infinite;
+    pointer-events: none;
+    z-index: -1;
   }
 
   .pulse-glow-emerald {
-    animation: pulseGlowEmerald 3s ease-in-out infinite;
+    position: relative;
+    isolation: isolate;
+  }
+  .pulse-glow-emerald::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: #10b981;
+    opacity: 0;
+    transform: scale(1);
+    animation: compositedPulseEmerald 3s ease-in-out infinite;
+    pointer-events: none;
+    z-index: -1;
   }
 
   /* Glassmorphism Classes */
@@ -218,21 +244,25 @@
     }
   }
 
-  @keyframes pulseGlowPrimary {
-    0%, 100% {
-      box-shadow: 0 0 15px rgba(46, 125, 50, 0.2);
+  @keyframes compositedPulsePrimary {
+    0% {
+      transform: scale(1);
+      opacity: 0.5;
     }
-    50% {
-      box-shadow: 0 0 30px rgba(46, 125, 50, 0.5);
+    100% {
+      transform: scale(1.4);
+      opacity: 0;
     }
   }
 
-  @keyframes pulseGlowEmerald {
-    0%, 100% {
-      box-shadow: 0 0 15px rgba(16, 185, 129, 0.2);
+  @keyframes compositedPulseEmerald {
+    0% {
+      transform: scale(1);
+      opacity: 0.5;
     }
-    50% {
-      box-shadow: 0 0 30px rgba(16, 185, 129, 0.5), 0 0 10px rgba(16, 185, 129, 0.2);
+    100% {
+      transform: scale(1.4);
+      opacity: 0;
     }
   }
 
