@@ -5,14 +5,16 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
+import { lazy, Suspense } from "react";
 import Landing from "./pages/Landing";
-import Dashboard from "./pages/Dashboard";
-import AdvisoryPage from "./pages/AdvisoryPage";
-import ClimatePage from "./pages/ClimatePage";
-import DiagnosisPage from "./pages/DiagnosisPage";
-import Contact from "./pages/Contact";
-import Auth from "./pages/Auth";
-import NotFound from "./pages/NotFound";
+
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const AdvisoryPage = lazy(() => import("./pages/AdvisoryPage"));
+const ClimatePage = lazy(() => import("./pages/ClimatePage"));
+const DiagnosisPage = lazy(() => import("./pages/DiagnosisPage"));
+const Contact = lazy(() => import("./pages/Contact"));
+const Auth = lazy(() => import("./pages/Auth"));
+const NotFound = lazy(() => import("./pages/NotFound"));
 import { isSupabaseConfigured } from "@/integrations/supabase/client";
 import { AlertCircle, Terminal, Layers } from "lucide-react";
 
@@ -84,6 +86,15 @@ const ConfigurationFallback = () => (
   </div>
 );
 
+const PageLoader = () => (
+  <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+    <div className="relative w-12 h-12">
+      <div className="absolute inset-0 rounded-full border-4 border-emerald-500/15" />
+      <div className="absolute inset-0 rounded-full border-4 border-emerald-500 border-t-transparent animate-spin" />
+    </div>
+  </div>
+);
+
 const App = () => {
   if (!isSupabaseConfigured) {
     return <ConfigurationFallback />;
@@ -97,16 +108,18 @@ const App = () => {
             <Toaster />
             <Sonner />
             <BrowserRouter>
-              <Routes>
-                <Route path="/" element={<Landing />} />
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/advisory" element={<AdvisoryPage />} />
-                <Route path="/climate" element={<ClimatePage />} />
-                <Route path="/diagnosis" element={<DiagnosisPage />} />
-                <Route path="/contact" element={<Contact />} />
-                <Route path="/auth" element={<Auth />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
+              <Suspense fallback={<PageLoader />}>
+                <Routes>
+                  <Route path="/" element={<Landing />} />
+                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/advisory" element={<AdvisoryPage />} />
+                  <Route path="/climate" element={<ClimatePage />} />
+                  <Route path="/diagnosis" element={<DiagnosisPage />} />
+                  <Route path="/contact" element={<Contact />} />
+                  <Route path="/auth" element={<Auth />} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </Suspense>
             </BrowserRouter>
           </TooltipProvider>
         </LanguageProvider>
