@@ -77,7 +77,14 @@
 
 @layer base {
   html {
-    font-size: 17.38px; /* Natively scales all layout metrics to 95% zoom */
+    font-size: 17.37px;
+    scrollbar-width: none;  /* Firefox */
+    -ms-overflow-style: none;  /* IE and Edge */
+  }
+
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, and Opera */
   }
 
   * {
@@ -87,6 +94,8 @@
   body {
     @apply bg-background text-foreground;
     font-family: 'Inter', sans-serif;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
   }
 }
 
