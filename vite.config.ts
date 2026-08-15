@@ -19,14 +19,25 @@ export default defineConfig(({ mode }) => ({
     },
   },
   build: {
+    target: 'es2020',
+    cssCodeSplit: true,
     rollupOptions: {
       output: {
         manualChunks(id) {
-          if (id.includes('node_modules')) {
-            if (id.includes('@supabase') || id.includes('websocket') || id.includes('@tanstack') || id.includes('react-query')) {
-              return 'database-vendor';
-            }
-          }
+          if (!id.includes('node_modules')) return;
+
+          const normalized = id.replace(/\\/g, '/');
+
+          if (normalized.includes('recharts')) return 'charts';
+          if (normalized.includes('@supabase') || normalized.includes('websocket')) return 'data';
+          if (normalized.includes('@tanstack')) return 'query';
+          if (normalized.includes('react-router')) return 'router';
+          if (normalized.includes('/react/') || normalized.includes('scheduler') || normalized.includes('use-subscription')) return 'react-core';
+          if (normalized.includes('@radix-ui')) return 'ui-kit';
+          if (normalized.includes('lucide-react')) return 'icons';
+          if (normalized.includes('date-fns') || normalized.includes('zod') || normalized.includes('clsx') || normalized.includes('tailwind-merge')) return 'utils';
+          if (normalized.includes('cmdk') || normalized.includes('embla') || normalized.includes('vaul')) return 'ui-helpers';
+          return 'vendor';
         }
       }
     }

@@ -1,11 +1,10 @@
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import Landing from "./pages/Landing";
 
 const Dashboard = lazy(() => import("./pages/Dashboard"));
@@ -16,10 +15,40 @@ const Contact = lazy(() => import("./pages/Contact"));
 const Auth = lazy(() => import("./pages/Auth"));
 const FarmsPage = lazy(() => import("./pages/FarmsPage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
-import { isSupabaseConfigured } from "@/integrations/supabase/client";
 import { AlertCircle, Terminal } from "lucide-react";
 
-const queryClient = new QueryClient();
+const isSupabaseConfigured = Boolean(
+  import.meta.env.VITE_SUPABASE_URL &&
+  import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY &&
+  import.meta.env.VITE_SUPABASE_URL.startsWith("http")
+);
+
+const AsyncQueryClientProvider = ({ children }: { children: React.ReactNode }) => {
+  const [QueryClientProvider, setQueryClientProvider] = useState<
+    React.ComponentType<{ client: any; children: React.ReactNode }> | null
+  >(null);
+  const [queryClient, setQueryClient] = useState<any>(null);
+
+  useEffect(() => {
+    let active = true;
+
+    import("@tanstack/react-query").then(({ QueryClient, QueryClientProvider }) => {
+      if (!active) return;
+      setQueryClient(new QueryClient());
+      setQueryClientProvider(() => QueryClientProvider);
+    });
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  if (!QueryClientProvider || !queryClient) {
+    return <>{children}</>;
+  }
+
+  return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
+};
 
 const ConfigurationFallback = () => (
   <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4 relative overflow-hidden font-sans">
@@ -102,7 +131,7 @@ const App = () => {
   }
 
   return (
-    <QueryClientProvider client={queryClient}>
+    <AsyncQueryClientProvider>
       <ThemeProvider>
         <LanguageProvider>
           <TooltipProvider>
@@ -126,7 +155,7 @@ const App = () => {
           </TooltipProvider>
         </LanguageProvider>
       </ThemeProvider>
-    </QueryClientProvider>
+    </AsyncQueryClientProvider>
   );
 };
 
