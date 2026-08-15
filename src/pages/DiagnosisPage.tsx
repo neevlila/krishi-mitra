@@ -41,6 +41,71 @@ const fileToBase64 = (file: File): Promise<string> => {
     });
 };
 
+const renderBoldText = (text: string) => {
+  const parts = text.split("**");
+  return parts.map((part, i) => {
+    if (i % 2 === 1) {
+      return <strong key={i} className="font-bold text-foreground">{part}</strong>;
+    }
+    return <span key={i}>{part}</span>;
+  });
+};
+
+const renderFormattedText = (text: string) => {
+  if (!text) return null;
+  const lines = text.split("\n");
+  
+  return (
+    <div className="space-y-1 text-sm text-muted-foreground">
+      {lines.map((line, index) => {
+        const cleanLine = line.trim();
+        
+        if (cleanLine === "---") {
+          return <hr key={index} className="my-2 border-border/60" />;
+        }
+        
+        if (cleanLine.startsWith("###")) {
+          const content = cleanLine.substring(3).trim();
+          return (
+            <h4 key={index} className="text-base font-semibold text-foreground mt-3 mb-1">
+              {renderBoldText(content)}
+            </h4>
+          );
+        }
+        
+        if (cleanLine.startsWith("* ") || cleanLine.startsWith("- ")) {
+          const content = cleanLine.substring(2).trim();
+          return (
+            <li key={index} className="ml-4 list-disc text-sm text-muted-foreground mb-0.5">
+              {renderBoldText(content)}
+            </li>
+          );
+        }
+        
+        const numMatch = cleanLine.match(/^(\d+)\.\s+(.*)$/);
+        if (numMatch) {
+          const content = numMatch[2];
+          return (
+            <div key={index} className="ml-4 text-sm text-muted-foreground flex gap-1 mb-0.5">
+              <span className="font-semibold text-primary">{numMatch[1]}.</span>
+              <span>{renderBoldText(content)}</span>
+            </div>
+          );
+        }
+        
+        if (!cleanLine) {
+          return <div key={index} className="h-2" />;
+        }
+        return (
+          <p key={index} className="leading-relaxed">
+            {renderBoldText(cleanLine)}
+          </p>
+        );
+      })}
+    </div>
+  );
+};
+
 const DiagnosisPage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -343,9 +408,7 @@ const DiagnosisPage = () => {
                         <div>
                           <h4 className="font-semibold text-accent mb-1">{t('diagnosisLabel')}:</h4>
                           <div className="text-sm text-foreground">
-                            {diagnostic.diagnosis?.split('**').map((part: string, i: number) => 
-                              i % 2 === 1 ? <strong key={i}>{part}</strong> : <span key={i}>{part}</span>
-                            )}
+                            {renderFormattedText(diagnostic.diagnosis)}
                           </div>
                         </div>
                         {diagnostic.confidence && (
@@ -362,10 +425,8 @@ const DiagnosisPage = () => {
                         )}
                         <div>
                           <h4 className="font-semibold text-secondary mb-1">{t('adviceLabel')}:</h4>
-                          <div className="text-sm text-muted-foreground whitespace-pre-wrap">
-                            {diagnostic.advice?.split('**').map((part: string, i: number) => 
-                              i % 2 === 1 ? <strong key={i}>{part}</strong> : <span key={i}>{part}</span>
-                            )}
+                          <div className="text-sm text-muted-foreground">
+                            {renderFormattedText(diagnostic.advice)}
                           </div>
                         </div>
                       </CardContent>

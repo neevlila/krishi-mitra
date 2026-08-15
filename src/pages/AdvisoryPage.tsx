@@ -36,13 +36,78 @@ interface Advisory {
   created_at: string;
 }
 
+const renderBoldText = (text: string) => {
+  const parts = text.split("**");
+  return parts.map((part, i) => {
+    if (i % 2 === 1) {
+      return <strong key={i} className="font-bold text-foreground">{part}</strong>;
+    }
+    return <span key={i}>{part}</span>;
+  });
+};
+
+const renderFormattedText = (text: string) => {
+  if (!text) return null;
+  const lines = text.split("\n");
+  
+  return (
+    <div className="space-y-1 text-sm text-muted-foreground">
+      {lines.map((line, index) => {
+        const cleanLine = line.trim();
+        
+        if (cleanLine === "---") {
+          return <hr key={index} className="my-2 border-border/60" />;
+        }
+        
+        if (cleanLine.startsWith("###")) {
+          const content = cleanLine.substring(3).trim();
+          return (
+            <h4 key={index} className="text-base font-semibold text-foreground mt-3 mb-1">
+              {renderBoldText(content)}
+            </h4>
+          );
+        }
+        
+        if (cleanLine.startsWith("* ") || cleanLine.startsWith("- ")) {
+          const content = cleanLine.substring(2).trim();
+          return (
+            <li key={index} className="ml-4 list-disc text-sm text-muted-foreground mb-0.5">
+              {renderBoldText(content)}
+            </li>
+          );
+        }
+        
+        const numMatch = cleanLine.match(/^(\d+)\.\s+(.*)$/);
+        if (numMatch) {
+          const content = numMatch[2];
+          return (
+            <div key={index} className="ml-4 text-sm text-muted-foreground flex gap-1 mb-0.5">
+              <span className="font-semibold text-primary">{numMatch[1]}.</span>
+              <span>{renderBoldText(content)}</span>
+            </div>
+          );
+        }
+        
+        if (!cleanLine) {
+          return <div key={index} className="h-2" />;
+        }
+        return (
+          <p key={index} className="leading-relaxed">
+            {renderBoldText(cleanLine)}
+          </p>
+        );
+      })}
+    </div>
+  );
+};
+
 const AdvisoryFormatter = ({ advice }: { advice: string }) => {
   try {
     const parsed = JSON.parse(advice);
     
     const renderValue = (value: unknown, depth = 0): JSX.Element => {
       if (typeof value === 'string') {
-        return <p className="ml-4 whitespace-pre-wrap">{value}</p>;
+        return <div className="ml-4">{renderFormattedText(value)}</div>;
       }
       if (Array.isArray(value)) {
         return (
@@ -81,7 +146,7 @@ const AdvisoryFormatter = ({ advice }: { advice: string }) => {
 
     return <div className="space-y-3">{renderValue(parsed)}</div>;
   } catch {
-    return <p className="whitespace-pre-wrap">{advice}</p>;
+    return <div className="whitespace-pre-wrap">{renderFormattedText(advice)}</div>;
   }
 };
 
