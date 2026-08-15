@@ -27,22 +27,44 @@ Designed with a premium glassmorphic interface, native multi-language translatio
 
 ## 🏗️ Secure Architecture Flow
 
-To prevent API key exposure and bypass client-side CORS issues, Krishi-Mitra route sensitive model requests through secure serverless edge function nodes:
+To prevent API key exposure and avoid client-side CORS leakage, Krishi-Mitra routes sensitive AI requests through secure serverless edge nodes and keeps secrets outside the browser runtime.
 
 ```mermaid
-graph TD
-    Client[📱 Client Browser]
-    SupabaseDB[(🗄️ Supabase Postgres)]
-    EdgeFn[⚡ Supabase Deno Edge Function]
-    NvidiaAPI[🟢 NVIDIA NIM API Node]
-    GeminiAPI[🔵 Google Gemini 3.5 Flash]
+flowchart TD
+    Client[Client Browser]
+    SupabaseDB[(Supabase Postgres)]
+    EdgeFn[Supabase Deno Edge Function]
+    Vault[(Secure Secret Vault)]
+    NvidiaAPI[NVIDIA NIM API]
+    GeminiAPI[Google Gemini API]
+    WeatherAPI[OpenWeather API]
 
-    Client -->|1. Auth & Fetch Logs| SupabaseDB
-    Client -->|2. Secure Chat Request| EdgeFn
-    EdgeFn -->|3. Read Safe Vault Secret| Env[🔒 NVIDIA_API_KEY]
-    EdgeFn -->|4. Proxy Completion| NvidiaAPI
-    Client -->|5. Image Analysis (Client Auth Key)| GeminiAPI
+    Client -->|1. Auth, session, and farm data| SupabaseDB
+    Client -->|2. Secure chat or advisory request| EdgeFn
+    EdgeFn -->|3. Read authorized secret| Vault
+    EdgeFn -->|4. Proxy model call| NvidiaAPI
+
+    Client -->|5. Upload leaf image| EdgeFn
+    EdgeFn -->|6. Verified diagnosis request| GeminiAPI
+
+    Client -->|7. Location weather lookup| WeatherAPI
 ```
+
+This keeps the browser free from raw API credentials while still allowing authorized model access for chat, diagnosis, and advisory workflows.
+
+---
+
+## ⚡ Mobile SEO & Performance Notes
+
+Krishi-Mitra is optimized for mobile-first performance and Lighthouse analysis.
+
+- Removed blocking external font CSS from the initial critical path
+- Deferred non-critical provider initialization until after first paint
+- Split large vendor chunks so the landing page loads a lighter initial bundle
+- Replaced heavy startup UI patterns with smaller native controls on the first screen
+- Kept the app shell lean to reduce render-blocking CSS and unused JavaScript on slow mobile connections
+
+These optimizations are intended to improve first paint, LCP, and overall mobile SEO readiness while preserving the premium app experience.
 
 ---
 
