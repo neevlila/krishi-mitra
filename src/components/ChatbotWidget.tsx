@@ -110,6 +110,7 @@ const ChatbotWidget = () => {
     if (messages.length === 1 && messages[0].role === "model") {
       setMessages([{ role: "model", text: t.welcome }]);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [language, t.welcome]);
 
   // Scroll to bottom on message change (without scrolling the main browser window)
