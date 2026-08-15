@@ -101,11 +101,12 @@ const Contact = () => {
         } else {
             throw new Error(result.message || "Failed to send message.");
         }
-    } catch (error: any) {
+    } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
         toast({
             variant: "destructive",
             title: "Error",
-            description: error.message || "An unexpected error occurred.",
+            description: errorMessage,
         });
     } finally {
         setSending(false);

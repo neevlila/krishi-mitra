@@ -238,11 +238,12 @@ const ClimatePage = () => {
         title: "Location Updated",
         description: `Agro-sensor location successfully set to ${tempLocation}`
       });
-    } catch (e: any) {
+    } catch (e: unknown) {
+      const errorMessage = e instanceof Error ? e.message : String(e);
       toast({
         variant: "destructive",
         title: "Error updating location",
-        description: e.message
+        description: errorMessage
       });
     }
   };

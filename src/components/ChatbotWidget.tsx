@@ -35,7 +35,7 @@ const renderFormattedText = (text: string) => {
     let currentLine = line;
     const isBullet = currentLine.trim().startsWith("* ") || currentLine.trim().startsWith("- ");
     if (isBullet) {
-      currentLine = currentLine.trim().replace(/^[\*\-]\s+/, "");
+      currentLine = currentLine.trim().replace(/^[-*]\s+/, "");
     }
 
     const parts = currentLine.split(/(\*\*.*?\*\*)/g);
@@ -151,11 +151,12 @@ const ChatbotWidget = () => {
 
       const answer = data.choices?.[0]?.message?.content || "I apologize, I could not generate an answer. Please try again.";
       setMessages(prev => [...prev, { role: "model", text: answer }]);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("NVIDIA API call failed:", error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
       setMessages(prev => [...prev, { 
         role: "model", 
-        text: `NVIDIA Chat Error: ${error.message || error}. Please ensure the NVIDIA_API_KEY secret is configured in your Supabase project.` 
+        text: `NVIDIA Chat Error: ${errorMessage}. Please ensure the NVIDIA_API_KEY secret is configured in your Supabase project.` 
       }]);
     } finally {
       setLoading(false);

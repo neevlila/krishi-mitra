@@ -1,5 +1,11 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
+declare global {
+  interface Document {
+    startViewTransition?: (callback: () => void) => void;
+  }
+}
+
 interface ThemeContextType {
   theme: 'light' | 'dark';
   toggleTheme: (event?: React.MouseEvent) => void;
@@ -28,7 +34,6 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
     document.documentElement.style.setProperty('--click-x', `${x}px`);
     document.documentElement.style.setProperty('--click-y', `${y}px`);
 
-    // @ts-ignore - startViewTransition is a modern browser API
     if (!document.startViewTransition) {
       setTheme(newTheme);
       localStorage.setItem('theme', newTheme);
@@ -36,7 +41,6 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
       return;
     }
 
-    // @ts-ignore
     document.startViewTransition(() => {
       setTheme(newTheme);
       localStorage.setItem('theme', newTheme);

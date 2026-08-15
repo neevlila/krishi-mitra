@@ -43,27 +43,26 @@ const WeatherWidget = () => {
   const [city, setCity] = useState("");
   const [unit, setUnit] = useState<'C' | 'F'>('C');
 
-  const fetchWeather = async () => {
-    if (!city.trim()) return;
-    const WEATHER_API_KEY = import.meta.env.VITE_WEATHER_API_KEY;
-    if (!WEATHER_API_KEY || WEATHER_API_KEY.startsWith('3***')) {
-        toast({
-            variant: "destructive",
-            title: "Configuration Error",
-            description: "Weather API key is not configured in .env file.",
-        });
-        return;
-    }
-    
+  const fetchWeatherForCity = useCallback(async (cityName: string) => {
+    if (!cityName.trim()) return;
     setLoading(true);
     try {
-        const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${WEATHER_API_KEY}&units=metric&lang=${t('languageCode')}`;
-        const response = await fetch(url);
-        if (!response.ok) {
-            throw new Error('Failed to fetch weather data for the specified city.');
+      const { data, error } = await supabase.functions.invoke('weather-service', {
+        body: {
+          city: cityName.trim(),
+          lang: t('languageCode')
         }
-        const data = await response.json();
-        setWeather(data);
+      });
+
+      if (error) {
+        throw new Error(error.message || JSON.stringify(error));
+      }
+
+      if (data?.error) {
+        throw new Error(data.error);
+      }
+
+      setWeather(data);
     } catch (error: unknown) {
       console.error("Weather API error:", error);
       const errorMessage = error instanceof Error ? error.message : 'Weather service is currently unavailable.';
@@ -76,7 +75,52 @@ const WeatherWidget = () => {
     } finally {
       setLoading(false);
     }
+  }, [t, toast]);
+
+  const fetchWeather = async () => {
+    await fetchWeatherForCity(city);
   };
+
+  useEffect(() => {
+    const loadDefaultLocationWeather = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+
+        // Try getting latest farm location first
+        const { data: farmData } = await supabase
+          .from("farms")
+          .select("location")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false })
+          .limit(1);
+
+        if (farmData && farmData.length > 0 && farmData[0].location) {
+          const defaultCity = farmData[0].location;
+          setCity(defaultCity);
+          fetchWeatherForCity(defaultCity);
+          return;
+        }
+
+        // Fallback to profile location
+        const { data: profileData } = await supabase
+          .from("profiles")
+          .select("location")
+          .eq("user_id", user.id)
+          .maybeSingle();
+
+        if (profileData?.location) {
+          const defaultCity = profileData.location;
+          setCity(defaultCity);
+          fetchWeatherForCity(defaultCity);
+        }
+      } catch (err: unknown) {
+        console.error("Failed to load user default location weather:", err);
+      }
+    };
+
+    loadDefaultLocationWeather();
+  }, [fetchWeatherForCity]);
   
   const convertTemp = (temp: number) => {
     if (unit === 'F') {

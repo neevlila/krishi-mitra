@@ -60,11 +60,12 @@ export default function Auth() {
             description: "A password reset link has been sent to your email address.",
         });
         setEmailSent(true);
-    } catch (error: any) {
+    } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
         toast({
             variant: "destructive",
             title: "Error",
-            description: error.message,
+            description: errorMessage,
         });
     } finally {
         setLoading(false);
@@ -105,11 +106,12 @@ export default function Auth() {
         });
         navigate("/dashboard");
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: error.message,
+        description: errorMessage,
       });
     } finally {
       setLoading(false);
@@ -132,11 +134,12 @@ export default function Auth() {
       });
       setIsResettingPassword(false);
       navigate("/dashboard");
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: error.message,
+        description: errorMessage,
       });
     } finally {
       setLoading(false);
@@ -153,11 +156,12 @@ export default function Auth() {
         },
       });
       if (error) throw error;
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
       toast({
         variant: "destructive",
         title: "Google sign-in failed",
-        description: error.message || "Unable to start Google sign-in.",
+        description: errorMessage,
       });
     } finally {
       setGoogleLoading(false);

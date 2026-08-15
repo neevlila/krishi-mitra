@@ -89,7 +89,33 @@ const DiagnosisPage = () => {
     if (error) {
       console.error("Error fetching diagnostics:", error);
     } else if (data) {
-      setDiagnostics(data);
+      // Generate temporary signed URLs dynamically for secured private storage paths
+      const updatedData = await Promise.all(
+        data.map(async (item) => {
+          try {
+            const path = item.image_url.includes('/crop-images/')
+              ? item.image_url.split('/crop-images/')[1]
+              : item.image_url;
+            
+            if (!path) return item;
+            
+            const { data: signedData, error: signedError } = await supabase.storage
+              .from('crop-images')
+              .createSignedUrl(path, 3600); // 1 hour duration
+
+            if (signedError) throw signedError;
+
+            return {
+              ...item,
+              image_url: signedData?.signedUrl || item.image_url
+            };
+          } catch (signedErr) {
+            console.error("Failed to generate signed URL for path:", item.image_url, signedErr);
+            return item;
+          }
+        })
+      );
+      setDiagnostics(updatedData);
     }
   }, [user]);
 
@@ -116,8 +142,13 @@ const DiagnosisPage = () => {
         if (dbError) throw dbError;
 
         if (items && items.length > 0) {
-          const paths = items.map(item => item.image_url.split('/crop-images/')[1]).filter(Boolean);
-          if(paths.length > 0) {
+          const paths = items.map(item => {
+            return item.image_url.includes('/crop-images/')
+              ? item.image_url.split('/crop-images/')[1]
+              : item.image_url;
+          }).filter(Boolean);
+
+          if (paths.length > 0) {
             await supabase.storage.from('crop-images').remove(paths);
           }
         }
@@ -130,7 +161,10 @@ const DiagnosisPage = () => {
         const { error: dbError } = await supabase.from("crop_diagnostics").delete().eq("id", itemToDelete);
         if (dbError) throw dbError;
 
-        const path = item.image_url.split('/crop-images/')[1];
+        const path = item.image_url.includes('/crop-images/')
+          ? item.image_url.split('/crop-images/')[1]
+          : item.image_url;
+
         if (path) {
           await supabase.storage.from('crop-images').remove([path]);
         }
@@ -138,8 +172,9 @@ const DiagnosisPage = () => {
         toast({ title: "Success", description: "Diagnosis has been deleted." });
       }
       await fetchDiagnostics(); // Re-fetch data to ensure UI is in sync with DB
-    } catch (error: any) {
-      toast({ variant: "destructive", title: "Error", description: error.message });
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      toast({ variant: "destructive", title: "Error", description: errorMessage });
     } finally {
       setDialogOpen(false);
       setItemToDelete(null);
@@ -148,20 +183,11 @@ const DiagnosisPage = () => {
 
   const handleImageUpload = async () => {
     if (!imageFile || !user) return;
-    const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
-    if (!GEMINI_API_KEY) {
-        toast({
-            variant: "destructive",
-            title: "Configuration Error",
-            description: "Gemini API key is not configured in .env file.",
-        });
-        return;
-    }
-
     setUploading(true);
     try {
         const fileExt = imageFile.name.split('.').pop();
-        const fileName = `${user.id}/${Date.now()}.${fileExt}`;
+        const diagnosisId = crypto.randomUUID();
+        const fileName = `${user.id}/${diagnosisId}.${fileExt}`;
         
         const { error: uploadError } = await supabase.storage
             .from('crop-images')
@@ -169,87 +195,39 @@ const DiagnosisPage = () => {
 
         if (uploadError) throw uploadError;
 
-        const { data: { publicUrl } } = supabase.storage
-            .from('crop-images')
-            .getPublicUrl(fileName);
-
         const base64Image = await fileToBase64(imageFile);
         const imageBase64Data = base64Image.split(',')[1];
-
-        const languageMap: { [key: string]: string } = {
-            'en': 'English',
-            'hi': 'Hindi',
-            'gu': 'Gujarati'
-        };
-        const responseLang = languageMap[t('languageCode') as keyof typeof languageMap] || 'English';
         
-        const prompt = `You are an expert agricultural AI assistant specializing in crop disease diagnosis. 
-        Analyze this image of a crop/plant and provide your ENTIRE response in ${responseLang} language.
-        
-        CRITICAL: Every single word, label, heading, and piece of content MUST be in ${responseLang} language.
-        
-        1. Diagnosis: Identify any diseases, pests, or health issues visible in the image (in ${responseLang})
-        2. Confidence: Rate your confidence level (0-100%) as a number
-        3. Advice: Provide actionable treatment recommendations and preventive measures (in ${responseLang})
-        
-        Format your response as JSON with the following structure:
-        {
-          "diagnosis": "detailed diagnosis written entirely in ${responseLang}",
-          "confidence": 85,
-          "advice": "detailed advice and recommendations written entirely in ${responseLang}"
-        }
-        
-        DO NOT include any English words in the diagnosis or advice fields.`;
-
-        const response = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${GEMINI_API_KEY}`,
-            {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    contents: [{
-                        parts: [
-                            { text: prompt },
-                            { inlineData: { mimeType: imageFile.type, data: imageBase64Data } }
-                        ]
-                    }]
-                })
+        const { data, error: funcError } = await supabase.functions.invoke('crop-diagnosis', {
+            body: {
+                image: imageBase64Data,
+                mimeType: imageFile.type,
+                languageCode: t('languageCode')
             }
-        );
+        });
 
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error('Gemini API error:', response.status, errorText);
-            throw new Error(`AI diagnosis service failed: ${response.status} ${response.statusText || ""}. ${errorText}`);
+        if (funcError) {
+            throw new Error(funcError.message || JSON.stringify(funcError));
         }
 
-        const responseData = await response.json();
-        const text = responseData.candidates[0].content.parts[0].text;
-        
-        let result;
-        try {
-            const jsonMatch = text.match(/\{[\s\S]*\}/);
-            if (jsonMatch) {
-                result = JSON.parse(jsonMatch[0]);
-            } else {
-                throw new Error("Failed to parse AI response.");
-            }
-        } catch (e) {
-            console.error('JSON parse error:', e);
-            throw new Error("Received an invalid response from the AI diagnosis service.");
+        if (data?.error) {
+            throw new Error(data.error);
         }
+
+        const numericConfidence = data.confidence === 'High' ? 90 : data.confidence === 'Moderate' ? 65 : 35;
 
         await supabase.from("crop_diagnostics").insert({
+            id: diagnosisId,
             user_id: user.id,
-            image_url: publicUrl,
-            diagnosis: result.diagnosis,
-            advice: result.advice,
-            confidence: result.confidence,
+            image_url: fileName,
+            diagnosis: data.diagnosis,
+            advice: data.advice,
+            confidence: numericConfidence,
         });
 
         toast({
-            title: t('diagnosisLabel'),
-            description: result.diagnosis,
+            title: "Diagnosis Complete",
+            description: data.diagnosis,
         });
 
         setImageFile(null);
@@ -372,8 +350,14 @@ const DiagnosisPage = () => {
                         </div>
                         {diagnostic.confidence && (
                           <div>
-                            <h4 className="font-semibold text-primary mb-1">{t('confidenceLabel')}:</h4>
-                            <p className="text-sm text-muted-foreground">{diagnostic.confidence}%</p>
+                            <h4 className="font-semibold text-primary mb-1">{t('confidenceLabel')} (AI Assessment):</h4>
+                            <p className="text-sm text-muted-foreground">
+                              {diagnostic.confidence >= 80 
+                                ? "Likely (High confidence - consult professional if uncertain)" 
+                                : diagnostic.confidence >= 50 
+                                ? "Possible (Moderate confidence - needs confirmation)" 
+                                : "Uncertain (Low confidence - please take a clearer photo)"}
+                            </p>
                           </div>
                         )}
                         <div>

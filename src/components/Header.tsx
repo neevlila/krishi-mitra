@@ -13,10 +13,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
+import type { User } from "@supabase/supabase-js";
 import { cn } from "@/lib/utils";
 
 interface HeaderProps {
-  user: any;
+  user: User;
 }
 
 const Header = ({ user }: HeaderProps) => {
@@ -45,6 +46,7 @@ const Header = ({ user }: HeaderProps) => {
 
   const navItems = [
     { to: '/dashboard', icon: Home, label: t('dashboard') },
+    { to: '/farms', icon: Sprout, label: t('farmProfile') },
     { to: '/advisory', icon: Leaf, label: t('advisory') },
     { to: '/climate', icon: Gauge, label: t('market') },
     { to: '/diagnosis', icon: Camera, label: t('diagnosis') },

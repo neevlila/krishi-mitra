@@ -14,9 +14,10 @@ const ClimatePage = lazy(() => import("./pages/ClimatePage"));
 const DiagnosisPage = lazy(() => import("./pages/DiagnosisPage"));
 const Contact = lazy(() => import("./pages/Contact"));
 const Auth = lazy(() => import("./pages/Auth"));
+const FarmsPage = lazy(() => import("./pages/FarmsPage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 import { isSupabaseConfigured } from "@/integrations/supabase/client";
-import { AlertCircle, Terminal, Layers } from "lucide-react";
+import { AlertCircle, Terminal } from "lucide-react";
 
 const queryClient = new QueryClient();
 
@@ -117,6 +118,7 @@ const App = () => {
                   <Route path="/diagnosis" element={<DiagnosisPage />} />
                   <Route path="/contact" element={<Contact />} />
                   <Route path="/auth" element={<Auth />} />
+                  <Route path="/farms" element={<FarmsPage />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </Suspense>

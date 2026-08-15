@@ -7,9 +7,16 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Leaf, ArrowLeft, Calendar, Trash, Trash2, Archive } from "lucide-react";
+import { Leaf, ArrowLeft, Calendar, Trash, Trash2, Archive, Sprout } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { format } from "date-fns";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -78,6 +85,21 @@ const AdvisoryFormatter = ({ advice }: { advice: string }) => {
   }
 };
 
+interface UserFarm {
+  id: string;
+  name: string;
+  location: string | null;
+}
+
+interface UserCrop {
+  id: string;
+  crop: string;
+  variety: string | null;
+  season: string | null;
+  farm_id: string;
+  farms: UserFarm | null;
+}
+
 const AdvisoryPage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -91,6 +113,55 @@ const AdvisoryPage = () => {
   const [advisories, setAdvisories] = useState<Advisory[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<string | 'all' | null>(null);
+
+  // Farm Context States
+  const [userCrops, setUserCrops] = useState<UserCrop[]>([]);
+  const [selectedCropId, setSelectedCropId] = useState<string>("manual");
+
+  const fetchAdvisories = useCallback(async () => {
+    if (!user) return;
+
+    const { data, error } = await supabase
+      .from("advisory_logs")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("Error fetching advisories:", error);
+    } else if (data) {
+      setAdvisories(data);
+    }
+  }, [user]);
+
+  const fetchUserCrops = useCallback(async () => {
+    if (!user) return;
+    try {
+      const { data, error } = await supabase
+        .from("farm_crops")
+        .select(`
+          id,
+          crop,
+          variety,
+          season,
+          farm_id,
+          farms:farm_id (
+            id,
+            name,
+            location
+          )
+        `)
+        .eq("status", "active")
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      if (data) {
+        setUserCrops(data as unknown as UserCrop[]);
+      }
+    } catch (err: unknown) {
+      console.error("Error fetching user farm crops:", err);
+    }
+  }, [user]);
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -116,31 +187,27 @@ const AdvisoryPage = () => {
     return () => subscription.unsubscribe();
   }, [navigate]);
 
-  const fetchAdvisories = useCallback(async () => {
-    if (!user) return;
-
-    const { data, error } = await supabase
-      .from("advisory_logs")
-      .select("*")
-      .eq("user_id", user.id)
-      .order("created_at", { ascending: false });
-
-    if (error) {
-      console.error("Error fetching advisories:", error);
-    } else if (data) {
-      setAdvisories(data);
-    }
-  }, [user]);
-
   useEffect(() => {
     if (user) {
       fetchAdvisories();
+      fetchUserCrops();
     }
-  }, [user, fetchAdvisories]);
+  }, [user, fetchAdvisories, fetchUserCrops]);
 
-  const handleDeleteRequest = (id: string | 'all') => {
-    setItemToDelete(id);
-    setDialogOpen(true);
+  const handleCropSelectChange = (val: string) => {
+    setSelectedCropId(val);
+    if (val === "manual") {
+      setCrop("");
+      setLocation("");
+      setSeason("");
+      return;
+    }
+    const found = userCrops.find(c => c.id === val);
+    if (found) {
+      setCrop(found.crop + (found.variety ? ` (${found.variety})` : ""));
+      setLocation(found.farms?.location || "");
+      setSeason(found.season || "");
+    }
   };
 
   const confirmDelete = async () => {
@@ -156,9 +223,10 @@ const AdvisoryPage = () => {
         if (error) throw error;
         toast({ title: "Success", description: "Advisory has been deleted." });
       }
-      await fetchAdvisories(); // Re-fetch data to ensure UI is in sync with DB
-    } catch (error: any) {
-      toast({ variant: "destructive", title: "Error", description: error.message });
+      await fetchAdvisories();
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      toast({ variant: "destructive", title: "Error", description: errorMessage });
     } finally {
       setDialogOpen(false);
       setItemToDelete(null);
@@ -167,108 +235,40 @@ const AdvisoryPage = () => {
 
   const handleGetAdvice = async () => {
     if (!user) return;
-    const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
-    if (!GEMINI_API_KEY) {
-        toast({
-            variant: "destructive",
-            title: "Configuration Error",
-            description: "Gemini API key is not configured in .env file.",
-        });
-        return;
-    }
-
     setLoading(true);
     try {
-        const languageMap: { [key: string]: string } = {
-            'en': 'English',
-            'hi': 'Hindi',
-            'gu': 'Gujarati'
-        };
-        const responseLang = languageMap[t('languageCode') as keyof typeof languageMap] || 'English';
-
-        const prompt = `You are an expert agricultural advisor. Provide farming advice in ${responseLang} language for:
-        Crop: ${crop || 'general farming'}
-        Location: ${location || 'not specified'}
-        Season: ${season || 'current season'}
-        
-        IMPORTANT: Provide the ENTIRE response in ${responseLang} language, including all headings, labels, and content.
-        
-        Format your response as JSON with this EXACT structure:
-        {
-          "diagnosis": "Brief summary in ${responseLang}",
-          "advice": {
-            "0_best_practices": {
-              "title": "Title in ${responseLang}",
-              "details": "Details in ${responseLang}"
-            },
-            "1_common_challenges": {
-              "title": "Title in ${responseLang}",
-              "details": "Details in ${responseLang}"
-            },
-            "2_recommended_fertilizers": {
-              "title": "Title in ${responseLang}",
-              "details": "Details in ${responseLang}"
-            },
-            "3_irrigation_management": {
-              "title": "Title in ${responseLang}",
-              "details": "Details in ${responseLang}"
-            },
-            "4_harvesting_guidance": {
-              "title": "Title in ${responseLang}",
-              "details": "Details in ${responseLang}"
+        const { data, error } = await supabase.functions.invoke('crop-advisory', {
+            body: {
+                crop,
+                location,
+                season,
+                languageCode: t('languageCode')
             }
-          }
-        }
-        
-        Remember: ALL text must be in ${responseLang}, and use 0-based indexing (start from 0, not 1).`;
+        });
 
-        const response = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${GEMINI_API_KEY}`,
-            {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    contents: [{ parts: [{ text: prompt }] }]
-                })
-            }
-        );
-
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error('Gemini API error:', response.status, errorText);
-            throw new Error(`AI advisory service failed: ${response.status} ${response.statusText || ""}. ${errorText}`);
+        if (error) {
+            throw new Error(error.message || JSON.stringify(error));
         }
 
-        const responseData = await response.json();
-        const text = responseData.candidates[0].content.parts[0].text;
-        
-        let result;
-        try {
-            const jsonMatch = text.match(/\{[\s\S]*\}/);
-            if (jsonMatch) {
-                result = JSON.parse(jsonMatch[0]);
-            } else {
-                throw new Error("Failed to parse AI response.");
-            }
-        } catch (e) {
-            console.error('JSON parse error:', e);
-            throw new Error("Received an invalid response from the AI advisory service.");
+        if (data?.error) {
+            throw new Error(data.error);
         }
 
         await supabase.from("advisory_logs").insert({
             user_id: user.id,
-            diagnosis: result.diagnosis,
-            advice: JSON.stringify(result.advice),
+            diagnosis: data.diagnosis,
+            advice: JSON.stringify(data.advice),
         });
 
         toast({
             title: t('advice'),
-            description: result.diagnosis,
+            description: data.diagnosis,
         });
 
         setCrop("");
         setLocation("");
         setSeason("");
+        setSelectedCropId("manual");
         fetchAdvisories();
     } catch (error: unknown) {
         toast({
@@ -305,25 +305,45 @@ const AdvisoryPage = () => {
                 {t('aiAdvisory')}
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <Input
-                placeholder={t('crop')}
-                value={crop}
-                onChange={(e) => setCrop(e.target.value)}
-                className="bg-background/50 border-border focus:ring-2 focus:ring-primary/50"
-              />
-              <Input
-                placeholder={t('location')}
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                className="bg-background/50 border-border focus:ring-2 focus:ring-primary/50"
-              />
-              <Input
-                placeholder={t('season')}
-                value={season}
-                onChange={(e) => setSeason(e.target.value)}
-                className="bg-background/50 border-border focus:ring-2 focus:ring-primary/50"
-              />
+             <CardContent className="space-y-4">
+               {userCrops.length > 0 && (
+                 <div className="space-y-1.5 mb-2">
+                   <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
+                     {t('farmProfile')} Selection
+                   </span>
+                   <Select value={selectedCropId} onValueChange={handleCropSelectChange}>
+                     <SelectTrigger className="rounded-xl bg-background/50 border-border">
+                       <SelectValue placeholder="Select Crop Profile" />
+                     </SelectTrigger>
+                     <SelectContent>
+                       <SelectItem value="manual">Enter Details Manually</SelectItem>
+                       {userCrops.map(c => (
+                         <SelectItem key={c.id} value={c.id}>
+                           {c.crop} {c.variety ? `(${c.variety})` : ''} - {c.farms?.name || 'Field'}
+                         </SelectItem>
+                       ))}
+                     </SelectContent>
+                   </Select>
+                 </div>
+               )}
+               <Input
+                 placeholder={t('crop')}
+                 value={crop}
+                 onChange={(e) => setCrop(e.target.value)}
+                 className="bg-background/50 border-border focus:ring-2 focus:ring-primary/50"
+               />
+               <Input
+                 placeholder={t('location')}
+                 value={location}
+                 onChange={(e) => setLocation(e.target.value)}
+                 className="bg-background/50 border-border focus:ring-2 focus:ring-primary/50"
+               />
+               <Input
+                 placeholder={t('season')}
+                 value={season}
+                 onChange={(e) => setSeason(e.target.value)}
+                 className="bg-background/50 border-border focus:ring-2 focus:ring-primary/50"
+               />
               <Button
                 onClick={handleGetAdvice}
                 disabled={loading}
