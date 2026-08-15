@@ -6,8 +6,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { lazy, Suspense } from "react";
-import Landing from "./pages/Landing";
 
+const Landing = lazy(() => import("./pages/Landing"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const AdvisoryPage = lazy(() => import("./pages/AdvisoryPage"));
 const ClimatePage = lazy(() => import("./pages/ClimatePage"));
