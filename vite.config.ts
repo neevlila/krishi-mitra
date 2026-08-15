@@ -37,16 +37,7 @@ export default defineConfig(({ mode }) => ({
       output: {
         manualChunks(id) {
           if (id.includes('node_modules')) {
-            if (id.includes('react') || id.includes('react-dom') || id.includes('scheduler') || id.includes('react-router')) {
-              return 'vendor-react-core';
-            }
-            if (id.includes('@supabase') || id.includes('websocket')) {
-              return 'vendor-supabase';
-            }
-            if (id.includes('lucide-react')) {
-              return 'vendor-icons';
-            }
-            return 'vendor-helpers';
+            return 'vendor';
           }
         }
       }
