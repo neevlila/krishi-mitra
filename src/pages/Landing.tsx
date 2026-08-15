@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import { Sprout, Leaf, Gauge, Camera, CloudSun, Moon, Sun, ShieldCheck, Thermometer } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -51,24 +50,23 @@ const Landing = () => {
             </div>
 
             {/* Dark Mode toggle */}
-            <Button
-              variant="outline"
-              size="icon"
+            <button
+              type="button"
               onClick={toggleTheme}
-              className="rounded-full h-9 w-9 bg-card border-border hover:bg-muted"
+              className="rounded-full h-9 w-9 bg-card border border-border hover:bg-muted inline-flex items-center justify-center"
               aria-label="Toggle dark mode"
             >
               {theme === 'dark' ? <Sun className="h-4.5 w-4.5" /> : <Moon className="h-4.5 w-4.5" />}
-            </Button>
+            </button>
 
             {/* Auth CTA button */}
-            <Button
-              size="sm"
+            <button
+              type="button"
               onClick={() => navigate('/auth')}
-              className="rounded-full px-5 h-9 bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-bold shadow-md shadow-primary/10"
+              className="rounded-full px-5 h-9 bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-bold shadow-md shadow-primary/10 border border-primary"
             >
               {t('signIn')}
-            </Button>
+            </button>
           </div>
         </div>
       </header>
@@ -102,23 +100,22 @@ const Landing = () => {
               </p>
               
               <div className="flex gap-4 justify-center lg:justify-start flex-wrap pt-2">
-                <Button 
-                  size="lg" 
-                  className="text-base px-8 py-6 shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 bg-gradient-to-r from-primary to-emerald-600 hover:from-primary hover:to-emerald-500 rounded-xl"
+                <button
+                  type="button"
+                  className="text-base px-8 py-6 shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 bg-gradient-to-r from-primary to-emerald-600 hover:from-primary hover:to-emerald-500 rounded-xl text-primary-foreground font-medium"
                   onClick={() => navigate('/auth')}
                 >
                   {t('getStarted')}
-                </Button>
-                <Button 
-                  size="lg" 
-                  variant="outline"
-                  className="text-base px-8 py-6 rounded-xl shadow-sm hover:shadow-md hover:-translate-y-1 transition-all bg-card border-border hover:bg-card/90"
+                </button>
+                <button
+                  type="button"
+                  className="text-base px-8 py-6 rounded-xl shadow-sm hover:shadow-md hover:-translate-y-1 transition-all bg-card border border-border hover:bg-card/90 text-foreground"
                   onClick={() => {
                     document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
                   }}
                 >
                   {t('learnMore')}
-                </Button>
+                </button>
               </div>
             </div>
 

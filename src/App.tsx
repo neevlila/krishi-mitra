@@ -1,11 +1,18 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
-import { lazy, Suspense, useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState, type ReactNode } from "react";
 import Landing from "./pages/Landing";
+
+const LazyTooltipProvider = lazy(() =>
+  import("@/components/ui/tooltip").then((module) => ({ default: module.TooltipProvider }))
+);
+const LazyToaster = lazy(() =>
+  import("@/components/ui/toaster").then((module) => ({ default: module.Toaster }))
+);
+const LazySonner = lazy(() =>
+  import("@/components/ui/sonner").then((module) => ({ default: module.Toaster }))
+);
 
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const AdvisoryPage = lazy(() => import("./pages/AdvisoryPage"));
@@ -23,9 +30,9 @@ const isSupabaseConfigured = Boolean(
   import.meta.env.VITE_SUPABASE_URL.startsWith("http")
 );
 
-const AsyncQueryClientProvider = ({ children }: { children: React.ReactNode }) => {
+const AsyncQueryClientProvider = ({ children }: { children: ReactNode }) => {
   const [QueryClientProvider, setQueryClientProvider] = useState<
-    React.ComponentType<{ client: any; children: React.ReactNode }> | null
+    React.ComponentType<{ client: any; children: ReactNode }> | null
   >(null);
   const [queryClient, setQueryClient] = useState<any>(null);
 
@@ -49,6 +56,16 @@ const AsyncQueryClientProvider = ({ children }: { children: React.ReactNode }) =
 
   return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
 };
+
+const AppShellProviders = ({ children }: { children: ReactNode }) => (
+  <Suspense fallback={null}>
+    <LazyTooltipProvider>
+      <LazyToaster />
+      <LazySonner />
+      {children}
+    </LazyTooltipProvider>
+  </Suspense>
+);
 
 const ConfigurationFallback = () => (
   <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4 relative overflow-hidden font-sans">
@@ -134,9 +151,7 @@ const App = () => {
     <AsyncQueryClientProvider>
       <ThemeProvider>
         <LanguageProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
+          <AppShellProviders>
             <BrowserRouter>
               <Suspense fallback={<PageLoader />}>
                 <Routes>
@@ -152,7 +167,7 @@ const App = () => {
                 </Routes>
               </Suspense>
             </BrowserRouter>
-          </TooltipProvider>
+          </AppShellProviders>
         </LanguageProvider>
       </ThemeProvider>
     </AsyncQueryClientProvider>
