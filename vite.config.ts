@@ -18,4 +18,17 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('@supabase') || id.includes('websocket') || id.includes('@tanstack') || id.includes('react-query')) {
+              return 'database-vendor';
+            }
+          }
+        }
+      }
+    }
+  },
 }));
