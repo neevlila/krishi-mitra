@@ -275,6 +275,11 @@ const AdvisoryPage = () => {
     }
   };
 
+  const handleDeleteRequest = (id: string | 'all') => {
+    setItemToDelete(id);
+    setDialogOpen(true);
+  };
+
   const confirmDelete = async () => {
     if (!user || !itemToDelete) return;
 
